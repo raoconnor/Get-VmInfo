@@ -4,12 +4,10 @@ Get-vm-details
 .Description
     Get virtual machine info
 	russ 02/05/2016
-
     
 .Example
     ./Get-VmInfo
 #>
-
 
 
 # Pre-code saves to path with unique name
@@ -26,12 +24,6 @@ Write-Host "Output will be saved to:"  								   -ForegroundColor Yellow
 Write-Host $filepath$datacenter-$filename-$date$time".csv"  			-ForegroundColor White
 Write-Host "---------------------------------------------------------" -ForegroundColor DarkYellow
 
-# Create empty results array to hold values
-# $resultsarray =@()
-
-
-
-
 
 # Option to run script against a single vm or specific cluster
 # Remove the Get Cluster section and replace with $vms = Get-VM to run on all vms in vcenter
@@ -42,7 +34,7 @@ $countCL = 0
 Write-Output " "  
 Write-Output "Clusters: "  
 Write-Output " "  
-	foreach($oC in $Cluster){  
+       foreach($oC in $Cluster){  
        Write-Output "[$countCL] $oc"  
        $countCL = $countCL+1  
        }  
@@ -51,10 +43,9 @@ Write-Output " "
 Write-host "please wait for script to finish, it may take a while...." -ForegroundColor Yellow
 $cluster = get-cluster $cluster[$choice] 
 	
-#Filter only powered on vms
+# Remove default filter to only check powered on vms
 $answer = Read-Host "Get only powered on vms (Y/N)" 
 if ($answer -ne "N"){$vms = Get-Cluster $cluster | Get-VM | where {$_.powerstate -eq "PoweredOn"}}
-
 else{ $vms = Get-Cluster $cluster | Get-VM}
 
 	
@@ -68,7 +59,7 @@ foreach ($vm in $vms){
 					
 		# Create an array object to hold results, and add data as attributes using the add-member commandlet
 		$resultObject = new-object PSObject
-        $resultObject | add-member -membertype NoteProperty -name "Folder" -Value $vm.Folder.Name
+        	$resultObject | add-member -membertype NoteProperty -name "Folder" -Value $vm.Folder.Name
 		$resultObject | add-member -membertype NoteProperty -name "Host" -Value $vm.VMHost
 		$resultObject | add-member -membertype NoteProperty -name "Name" -Value $vm.Name
 		$resultObject | add-member -membertype NoteProperty -name "PowerState" -Value $vm.PowerState
@@ -88,8 +79,7 @@ foreach ($vm in $vms){
 		#$resultObject | add-member -membertype NoteProperty -name "RDM Disk Type" -Value (get-vm -Name $vm).ExtensionData.Config.Hardware.Device.Backing.CompatibilityMode
 	
 		# Write array output to results 
-		$resultsarray += $resultObject						            
-	   	
+		$resultsarray += $resultObject						            	   	
 }
 
 		
@@ -98,3 +88,5 @@ $resultsarray | Out-GridView
  
 # export to csv 
 $resultsarray | Export-Csv $filepath$filename"-"$datacenter$cluster"-"$date$time".csv" -NoType	
+
+
